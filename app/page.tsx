@@ -16,7 +16,7 @@ interface DraggingTask {
 const App: React.FC = () => {
   const [columns, setColumns] = useState<Column[]>([
     { id: "col1", title: "Event 1", tasks: ["Task 1", "Task 2"] },
-    { id: "col2", title: "Event 2", tasks: ["Task 3","Task 4"] },
+    { id: "col2", title: "Event 2", tasks: ["Task 3", "Task 4"] },
     { id: "col3", title: "Event 3", tasks: ["Task 5", "Task 6"] },
     { id: "col4", title: "Event 4", tasks: ["Task 7", "Task 8"] },
   ]);
@@ -53,16 +53,22 @@ const App: React.FC = () => {
 
       const updatedColumns = columns.map((column) => {
         if (column.id === sourceColumnId) {
-          return {
-            ...column,
-          };
+          const newTasks = [...column.tasks];
+          const sourceIndex = newTasks.indexOf(sourceTask);
+          newTasks.splice(sourceIndex, 1); // Remove the dragged task
+
+          if (column.id === columnId) {
+            const dropIndex = hoveredTaskIndex !== null ? hoveredTaskIndex : newTasks.length;
+            newTasks.splice(dropIndex, 0, sourceTask); // Reorder within the same column
+          }
+
+          return { ...column, tasks: newTasks };
         }
 
-        if (column.id === columnId) {
+        if (column.id === columnId && column.id !== sourceColumnId) {
           const newTasks = [...column.tasks];
-          const dropIndex =
-            hoveredTaskIndex !== null ? hoveredTaskIndex : newTasks.length;
-          newTasks.splice(dropIndex, 0, sourceTask);
+          const dropIndex = hoveredTaskIndex !== null ? hoveredTaskIndex : newTasks.length;
+          newTasks.splice(dropIndex, 0, sourceTask); // Insert task into a new column
           return { ...column, tasks: newTasks };
         }
 
@@ -90,7 +96,7 @@ const App: React.FC = () => {
           </h2>
           <div className="space-y-2">
             {column.tasks.map((task, index) => (
-              <div key={task} className={`p-3 bg-gray-200 rounded-md cursor-grab border text-black ${hoveredTaskIndex === index && hoveredColumn === column.id ? "border-blue-400 ": "border-gray-300"}`} draggable onDragStart={(e) => onDragStart(e, task, column.id)}
+              <div key={task} className={`p-3 bg-gray-200 rounded-md cursor-grab border text-black ${hoveredTaskIndex === index && hoveredColumn === column.id ? "border-blue-400 " : "border-gray-300"}`} draggable onDragStart={(e) => onDragStart(e, task, column.id)}
                 onDragOver={(e) => onDragOver(e, column.id, index)}>
                 {task}
               </div>
