@@ -23,7 +23,7 @@ const App: React.FC = () => {
 
   const [draggingTask, setDraggingTask] = useState<DraggingTask | null>(null);
   const [hoveredColumn, setHoveredColumn] = useState<string | null>(null);
-  const [hoveredTaskIndex, setHoveredTaskIndex] = useState<number | null>(null);
+  const [hoveredTaskId, sethoveredTaskId] = useState<number | null>(null);
 
   const onDragStart = (
     e: React.DragEvent<HTMLDivElement>,
@@ -41,7 +41,7 @@ const App: React.FC = () => {
   ) => {
     e.preventDefault();
     setHoveredColumn(columnId);
-    setHoveredTaskIndex(index);
+    sethoveredTaskId(index);
   };
 
   const onDrop = (e: React.DragEvent<HTMLDivElement>, columnId: string) => {
@@ -55,11 +55,10 @@ const App: React.FC = () => {
         if (column.id === sourceColumnId) {
           const newTasks = [...column.tasks];
           const sourceIndex = newTasks.indexOf(sourceTask);
-          newTasks.splice(sourceIndex, 1); // Remove the dragged task
-
+          newTasks.splice(sourceIndex, 1); 
           if (column.id === columnId) {
-            const dropIndex = hoveredTaskIndex !== null ? hoveredTaskIndex : newTasks.length;
-            newTasks.splice(dropIndex, 0, sourceTask); // Reorder within the same column
+            const dropIndex = hoveredTaskId !== null ? hoveredTaskId : newTasks.length;
+            newTasks.splice(dropIndex, 0, sourceTask);
           }
 
           return { ...column, tasks: newTasks };
@@ -67,8 +66,8 @@ const App: React.FC = () => {
 
         if (column.id === columnId && column.id !== sourceColumnId) {
           const newTasks = [...column.tasks];
-          const dropIndex = hoveredTaskIndex !== null ? hoveredTaskIndex : newTasks.length;
-          newTasks.splice(dropIndex, 0, sourceTask); // Insert task into a new column
+          const dropIndex = hoveredTaskId !== null ? hoveredTaskId : newTasks.length;
+          newTasks.splice(dropIndex, 0, sourceTask); 
           return { ...column, tasks: newTasks };
         }
 
@@ -78,7 +77,7 @@ const App: React.FC = () => {
       setColumns(updatedColumns);
       setDraggingTask(null);
       setHoveredColumn(null);
-      setHoveredTaskIndex(null);
+      sethoveredTaskId(null);
     }
   };
 
@@ -96,7 +95,7 @@ const App: React.FC = () => {
           </h2>
           <div className="space-y-2">
             {column.tasks.map((task, index) => (
-              <div key={task} className={`p-3 bg-gray-200 rounded-md cursor-grab border text-black ${hoveredTaskIndex === index && hoveredColumn === column.id ? "border-blue-400 " : "border-gray-300"}`} draggable onDragStart={(e) => onDragStart(e, task, column.id)}
+              <div key={task} className={`p-3 bg-gray-200 rounded-md cursor-grab border text-black ${hoveredTaskId === index && hoveredColumn === column.id ? "border-blue-400 " : "border-gray-300"}`} draggable onDragStart={(e) => onDragStart(e, task, column.id)}
                 onDragOver={(e) => onDragOver(e, column.id, index)}>
                 {task}
               </div>
